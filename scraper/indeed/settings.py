@@ -1,3 +1,6 @@
+from dotenv import load_dotenv
+import os
+load_dotenv(dotenv_path="secrets/keys.env")
 
 BOT_NAME = 'indeed'
 
@@ -14,7 +17,7 @@ NEWSPIDER_MODULE = 'indeed.spiders'
 ROBOTSTXT_OBEY = False
 
 ## ScrapeOps API Key
-SCRAPEOPS_API_KEY = '07f0ba08-eed7-4a68-beb4-9a7255c4c075' ## Get Free API KEY here: https://scrapeops.io/app/register/main
+SCRAPEOPS_API_KEY = os.getenv('SCRAPEOPS_API_KEY') ## Get Free API KEY here: https://scrapeops.io/app/register/main
 
 ## Enable ScrapeOps Proxy
 SCRAPEOPS_PROXY_ENABLED = True

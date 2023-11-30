@@ -48,7 +48,9 @@ scrapy-fake-useragent = "*"
 scrapy-rotating-proxies = "*"
 pip = "*"
 install = "*"
+python-dotenv = "*"
 
 [dev-packages]
 
 [requires]
+python_version = "3.10"
