@@ -86,7 +86,7 @@ def recommend_skill(id, job_title):
     s_engine = SubQuestionQueryEngine.from_defaults(query_engine_tools=query_engine_tools, use_async=True)
     response = s_engine.query(f"What does the user with email {id} need to learn to become a {job_title}?")
     with open(f"{id}_recommended.txt", "w") as f:
-        f.write(response)
+        f.write(str(response))
 
 def upload():
     print("upload")

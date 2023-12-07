@@ -9,6 +9,7 @@ pinecone-client = "*"
 python-dotenv = "*"
 google-cloud-storage = "*"
 pypdf = "*"
+async-timeout = "*"
 
 [dev-packages]
 
