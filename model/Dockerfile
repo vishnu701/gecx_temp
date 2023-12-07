@@ -20,6 +20,6 @@ RUN pipenv sync
 
 ADD . /app
 
-ENTRYPOINT ["/bin/bash"]
+EXPOSE 8000
 
-CMD ["-c", "pipenv shell"]
+CMD ["pipenv", "run", "uvicorn", "cli:app", "--host", "0.0.0.0", "--port", "8000"]

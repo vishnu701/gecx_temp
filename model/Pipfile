@@ -9,6 +9,8 @@ pinecone-client = "*"
 python-dotenv = "*"
 google-cloud-storage = "*"
 pypdf = "*"
+fastapi = "*"
+uvicorn = "*"
 
 [dev-packages]
 

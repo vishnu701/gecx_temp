@@ -12,6 +12,7 @@ import pinecone
 import argparse
 import os
 
+from fastapi import FastAPI
 from dotenv import load_dotenv
 import nest_asyncio
 
@@ -23,6 +24,12 @@ bucket_name = "jds_gecx"
 cvs_dir = "cvs"
 pinecone_index_name = 'jds'
 upload_path = "job_recommend"
+
+app = FastAPI()
+
+@app.get("/")
+def read_root():
+    return {"message": "Welcome to the LLM API"}
 
 def download():
     print("download")
@@ -40,6 +47,24 @@ def download():
         if blob.name.endswith(".pdf"):
             blob.download_to_filename(blob.name)
 
+# Downloads a particular CV
+def download_cv(id):
+    print("downloading CV")
+
+    # Clear
+    shutil.rmtree(cvs_dir, ignore_errors=True, onerror=None)
+    os.makedirs(cvs_dir, exist_ok=True)
+
+    storage_client = storage.Client(project=gcp_project)
+
+    bucket = storage_client.bucket(bucket_name)
+    blobs = bucket.list_blobs(prefix=cvs_dir + "/")
+    for blob in blobs:
+        print(blob.name)
+        if blob.name.endswith(f"{id}.pdf"):
+            blob.download_to_filename(blob.name)
+
+
 def load_api_keys():
     load_dotenv(dotenv_path="secrets/keys.env")
 
@@ -50,7 +75,15 @@ def initialize_pinecone():
         environment=os.getenv('PINECONE_ENVIRONMENT')
     )
 
-def recommend_skill(id, job_title):
+@app.post("/predict/")
+def recommend_skill(query: dict):
+
+    id = query["id"]
+    job_title = query["job_title"]
+
+    # downloading particular CV
+    load_api_keys()
+    download_cv(id)
     # Reading the PDF files in the directory "JDs"
     cvs = SimpleDirectoryReader(input_files=[os.path.join(cvs_dir, f"{id}.pdf")]).load_data()
     
@@ -86,7 +119,8 @@ def recommend_skill(id, job_title):
     s_engine = SubQuestionQueryEngine.from_defaults(query_engine_tools=query_engine_tools, use_async=True)
     response = s_engine.query(f"What does the user with email {id} need to learn to become a {job_title}?")
     with open(f"{id}_recommended.txt", "w") as f:
-        f.write(response)
+        f.write(str(response))
+    return {"response": str(response)}
 
 def upload():
     print("upload")
@@ -111,7 +145,10 @@ def main(args=None):
         download()
     if args.recommend:
         load_api_keys()
-        recommend_skill(args.id, args.jobtitle)
+
+        query = {"id": args.id, "job_title": args.jobtitle}
+        
+        recommend_skill(query)
     if args.upload:
         upload()
 

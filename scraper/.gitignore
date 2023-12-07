@@ -1,2 +1,4 @@
 data/
-secrets
+secrets/
+
+.DS_Store
