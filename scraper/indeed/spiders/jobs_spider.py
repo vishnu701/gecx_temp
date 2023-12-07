@@ -97,18 +97,20 @@ class IndeedJobSpider(scrapy.Spider):
         script_tag  = re.findall(r"_initialData=(\{.+?\});", response.text)
         if script_tag is not None:
             json_blob = json.loads(script_tag[0])
-            print(json_blob)
-            job = json_blob["jobInfoWrapperModel"]["jobInfoModel"]
+            # print("=================")
             r = re.compile("^.*Posted: .*$")
+            job = json_blob["jobInfoWrapperModel"]["jobInfoModel"]
+            # print(list(filter(r.match, job.get('sanitizedJobDescription').splitlines())))
+            # print("=================")
             yield {
                 'keyword': keyword,
                 'location': location,
                 'page': page,
                 'position': position,
                 'company': job["jobInfoHeaderModel"].get('companyName'),
-                'listingURL': "https://www.indeed.com/rc/clk?jk="+str(response.meta['jobKey']),
+                'listingURL': "https://www.indeed.com/m/basecamp/viewjob?viewtype=embedded&jk="+str(response.meta['jobKey']),
                 'jobTitle': job["jobInfoHeaderModel"].get('jobTitle'),
-                'pubDate': list(filter(r.match, job.get('sanitizedJobDescription').splitlines()))[0].split(":")[1].strip(),
+                # 'pubDate': list(filter(r.match, job.get('sanitizedJobDescription').splitlines()))[0].split(":")[1].strip(),
                 'jobDescription': job.get('sanitizedJobDescription') if job.get('sanitizedJobDescription') is not None else '',
             }
 
